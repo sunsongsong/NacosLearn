@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: nacos-config
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        prefix: ${spring.application.name}
+        file-extension: yml
+        shared-configs[0].dataId: shareconfig.yml
+        shared-configs[0].refresh: true
+
+#nacos主要功能：注册中心、配置中心
+#注册中心: 类似eureka,提供了命名空间隔离
+#配置中心: 提供了namespace命名空间、group、data-id等方式隔离
+#参考博文：https://www.larscheng.com/nacos-namespace/
+
+#本demo主要尝试使用nacos进行rocketMQ的多环境隔离，结论失败
+#原因：使用RocketMQMessageListener监听topic,程序在启动时,就将已经将配置写入了，后期无法更改
+
+
+

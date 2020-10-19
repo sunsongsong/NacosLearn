@@ -1,0 +1,178 @@
+rocket安装：
+一、下载
+
+前往 http://rocketmq.apache.org/release_notes/release-notes-4.5.1/ ，下载 Binary 文件即可。
+
+例如RocketMQ 4.5.1的下载地址：
+
+    Binary: rocketmq-all-4.5.1-bin-release.zip
+
+二、系统要求
+
+    64位操作系统，生产环境建议Linux/Unix/MacOS（Windows操作系统安装说明详见 Windows操作系统安装教程）
+    64位JDK 1.8（目前RocketMQ不支持 JDK 11）
+    4G+的可用磁盘
+
+三、Linux/Unix/MacOS安装教程
+3.1 搭建
+
+    解压压缩包
+
+    unzip rocketmq-all-4.5.1-bin-release.zip
+
+    切换目录到RocketMQ根目录
+
+    cd rocketmq-all-4.5.1-bin-release
+
+    启动Name Server
+
+    nohup sh bin/mqnamesrv &
+
+    验证是否启动OK：
+
+    tail -f ~/logs/rocketmqlogs/namesrv.log
+
+    # 如果成功启动，能看到类似如下的日志：
+    2019-07-18 17:03:56 INFO main - The Name Server boot success. ...
+
+    启动 Broker
+
+    nohup sh bin/mqbroker -n localhost:9876 &
+
+    验证是否启动OK：
+
+    tail -f ~/logs/rocketmqlogs/broker.log
+
+    # 如果启动成功，能看到类似如下的日志：
+    2019-07-18 17:08:41 INFO main - The broker[itmuchcomdeMacBook-Pro.local, 192.168.43.197:10911] boot success. serializeType=JSON and name server is localhost:9876
+
+3.2 验证RocketMQ功能正常（可选）
+3.2.1 验证生产消息正常
+
+执行如下命令：
+
+export NAMESRV_ADDR=localhost:9876
+sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
+
+能看到类似如下输出：
+
+SendResult [sendStatus=SEND_OK, msgId=C0A82BC5F36C511D50C05B41...
+
+3.2.2 验证消费消息正常
+
+执行如下命令：
+
+sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
+
+能看到类似如下输出：
+
+ConsumeMessageThread_4 Receive New Messages: [MessageExt [queueId=3, stor....
+
+3.3 停止
+
+依次执行以下两条命令即可
+
+# 命令
+sh bin/mqshutdown broker
+# 输出如下信息说明停止成功
+The mqbroker(36695) is running...
+Send shutdown request to mqbroker(36695) OK
+
+# 命令
+sh bin/mqshutdown namesrv
+# 输出如下信息说明停止成功
+The mqnamesrv(36664) is running...
+Send shutdown request to mqnamesrv(36664) OK
+
+作者：大目
+链接：https://www.imooc.com/article/290089
+来源：慕课网
+本文原创发布于慕课网 ，转载请注明出处，谢谢合作
+
+
+
+-----------------------------------------------------------------------------------------------------
+http://www.liurain.com/archives/1566913271894
+setx -m JAVA_HOME "C:\Program Files\Java\jdk1.8.0_251"
+echo %JAVA_HOME%
+
+使用管理员身份打开cmd.exe
+d:
+cd \rocketmq\rocketmq-all-4.7.1-bin-release\bin
+start mqnamesrv.cmd
+start mqbroker.cmd -n 127.0.0.1:9876 autoCreateTopicEnable=true
+
+---------------------------------------------------------------------------------------------------------
+git clone https://github.com/apache/rocketmq-externals.git
+
+d:
+cd D:\rocketmq\rocketmq-externals\rocketmq-console\target
+java -jar rocketmq-console-ng-2.0.0.jar
+
+浏览器中输入 http://127.0.0.1:8088
+
+
+相关知识点：
+rocketmq构成：nameserver + broker + client
+
+一个消费组对应多个topic,一个topic对应多个消费组,如果已经存在一个group加一个topic, 那么第二个重名的group+topic是不可用的
+
+
+----------------------------------------------------------------------------------------------------------
+问答记录：
+1.对于顺序消息，如果消费者和队列都扩容，会不会有问题？
+队列扩容时，发送端可能导致有顺序的一些消息分布到不同的队列，导致业务顺序不一致
+消费者扩容不会，顺序消费队列会加锁，保证队列有序。也就是发送不导致业务数据错乱无序，顺序消费除了重复消费外，可以保证分区有序
+同理master节点掉线也会影响顺序消费
+
+2.如何快速消费积压的消息？
+（1）得看看消费详情里各个broker是不是堆积都是整整齐齐，如果不是才是个别禁写。
+	如果是，那就有可能是消费端处理不过来了。
+	但是单纯的扩容消费端也不一定有效，要是消费端调用的第三方服务处理不过来，还得扩容第三方服务。特别是消耗计算能力的。
+（2）如果个别broker堆积过高，消费也慢。可以找到对应的消费端，再继续排查。
+
+3.RabbitMQ的架构
+	NameServer + Broker + ClientProducer + ClientConsumer
+	NameServer: Topic的注册中心
+	Broker:  消息存储服务器，分为两种角色：Master 与 Slave
+		Master主要负责数据的读写，当master压力过高时，slave也可以承担读服务
+		所有的broker会定时想
+	ClientProducer: 生产者
+	ClientConsumer: 消费者
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

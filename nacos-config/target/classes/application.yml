@@ -1,0 +1,12 @@
+server:
+  port: 8003
+
+rocketmq:
+  producer:
+    group: ${spring.application.name}
+  name-server: localhost:9876
+  retry:
+    cron: 0/30 * * * * ?
+    enable: true
+    times: 5
+    max: 30
